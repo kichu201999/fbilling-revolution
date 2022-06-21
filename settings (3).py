@@ -12776,7 +12776,7 @@ def mainpage():
       count = 0
       for p in add_product_detail:
         if True:
-          pur_add_cusventtree.insert(parent='',index='end',iid=p,text='',values=(p[0],p[4],p[7],p[12],p[13]))
+          pur_add_cusventtree.insert(parent='',index='end',iid=p,text='',values=(p[2],p[4],p[7],p[12],p[13]))
         else:
           pass
       count += 1
@@ -12954,7 +12954,7 @@ def mainpage():
             checktax1 = list(purch_tree.item(child, 'values'))
             if checktax1[6] == "yes":
               totaltax1 =(totaltax1 + float(checktax1[8]))
-              tax1.config(text=(float(totaltax1)*float(porder_tax4.get())/100))
+              summery_tax1.config(text=(float(totaltax1)*float(porder_tax4.get())/100))
               tot = (float(totaltax1)*float(porder_tax4.get())/100)
             else:
               pass
@@ -12975,16 +12975,16 @@ def mainpage():
           # estimate_balancee1.config(text=total+tot+tot2-discou+extracs)
 
 
-          valu10= pur_add_cusventtree.item(proskuid)["values"][0]
-          sqllll = "SELECT * FROM productservice  WHERE productserviceid= %s"
-          r=(valu10,)
-          fbcursor.execute(sqllll,r)
-          child=fbcursor.fetchone()
+          # valu10= pur_add_cusventtree.item(proskuid)["values"][1]
+          # sqllll = "SELECT * FROM productservice  WHERE productserviceid= %s"
+          # r=(valu10,)
+          # fbcursor.execute(sqllll,r)
+          # child=fbcursor.fetchone()
 
-          sql21= 'INSERT INTO storingproduct(Productserviceid,porderid,sku,category,name,description,status,unitprice,peices,cost,taxable,priceminuscost,serviceornot,stock,stocklimit,warehouse,privatenote,quantity,tax2) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-          vatree=(child[0],pord_no,child[2],child[3],child[4],child[5],child[6],child[7],child[8],child[9],child[10],child[11],child[12],child[13],child[14],child[15],child[16],child[17],1)
-          fbcursor.execute(sql21,vatree,)
-          fbilldb.commit()
+          # sql21= 'INSERT INTO storingproduct(Productserviceid,porderid,sku,category,name,description,status,unitprice,peices,cost,taxable,priceminuscost,serviceornot,stock,stocklimit,warehouse,privatenote,quantity,tax2) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+          # vatree=(child[0],pord_no,child[2],child[3],child[4],child[5],child[6],child[7],child[8],child[9],child[10],child[11],child[12],child[13],child[14],child[15],child[16],child[17],1)
+          # fbcursor.execute(sql21,vatree,)
+          # fbilldb.commit()
 
         
         newselection.destroy()
@@ -13042,6 +13042,33 @@ def mainpage():
       fbcursor.execute(porder_sql,porder_val)
       fbilldb.commit()
       #messagebox.showinfo("F-Billing Revolution","porder saved")
+
+      sql = "select * from company"
+      fbcursor.execute(sql)
+      pord_pro_ser = fbcursor.fetchone()
+      for child in purch_tree.get_children():
+        insert_pord_pro_ser = list(purch_tree.item(child, 'values'))
+        #print(insert_pord_pro_ser[7],insert_pord_pro_ser[6])
+        if not pord_pro_ser:
+          sql = 'insert into storingproduct(porder_no,sku,name,description,unitprice,quantity,peices,price) values(%s,%s,%s,%s,%s,%s,%s,%s)'
+          val = (porder_no,insert_pord_pro_ser[0],insert_pord_pro_ser[1],insert_pord_pro_ser[2],insert_pord_pro_ser[3],insert_pord_pro_ser[4],insert_pord_pro_ser[5],insert_pord_pro_ser[6])
+          fbcursor.execute(sql,val)
+          fbilldb.commit()
+        elif  pord_pro_ser[14] == "1":
+          sql = 'insert into storingproduct(porder_no,sku,name,description,unitprice,quantity,peices,price) values(%s,%s,%s,%s,%s,%s,%s,%s)'
+          val = (porder_no,insert_pord_pro_ser[0],insert_pord_pro_ser[1],insert_pord_pro_ser[2],insert_pord_pro_ser[3],insert_pord_pro_ser[4],insert_pord_pro_ser[5],insert_pord_pro_ser[6])
+          fbcursor.execute(sql,val)
+          fbilldb.commit()
+        elif pord_pro_ser[14] == "2":
+          sql = 'insert into storingproduct(porder_no,sku,name,description,unitprice,quantity,peices,taxable,price) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+          val = (porder_no,insert_pord_pro_ser[0],insert_pord_pro_ser[1],insert_pord_pro_ser[2],insert_pord_pro_ser[3],insert_pord_pro_ser[4],insert_pord_pro_ser[5],insert_pord_pro_ser[6],insert_pord_pro_ser[7])
+          fbcursor.execute(sql,val)
+          fbilldb.commit()
+        elif pord_pro_ser[14] == "3":
+          sql = 'insert into storingproduct(porder_no,sku,name,description,unitprice,quantity,peices,taxable,tax2,price) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+          val = (porder_no,insert_pord_pro_ser[0],insert_pord_pro_ser[1],insert_pord_pro_ser[2],insert_pord_pro_ser[3],insert_pord_pro_ser[4],insert_pord_pro_ser[5],insert_pord_pro_ser[6],insert_pord_pro_ser[7],insert_pord_pro_ser[8])
+          fbcursor.execute(sql,val)
+          fbilldb.commit()
       
 
     #preview new line
@@ -14696,10 +14723,23 @@ def mainpage():
     order1=Label(summaryfrme, text="$0.00")
     order1.place(x=130 ,y=105)
 
+    ############### Line Up ###############
+    def Pord_lineup():
+      rows = purch_tree.selection()
+      for row in rows:
+        purch_tree.move(row, purch_tree.parent(row), purch_tree.index(row)-1)
+
+    ############### Line Down ###############
+    def Pord_linedown():
+      rows = purch_tree.selection()
+      for row in rows:
+        purch_tree.move(row, purch_tree.parent(row), purch_tree.index(row)+1)
+
+
     fir5Frame=Frame(pop1,height=38,width=210)
     fir5Frame.place(x=735,y=485)
-    btndown=Button(fir5Frame, compound="left", text="Line Down").place(x=75, y=0)
-    btnup=Button(fir5Frame, compound="left", text="Line Up").place(x=150, y=0)
+    btndown=Button(fir5Frame, compound="left", text="Line Down",command=Pord_linedown).place(x=75, y=0)
+    btnup=Button(fir5Frame, compound="left", text="Line Up",command=Pord_lineup).place(x=150, y=0)
 
     # sql3='UPDATE porder SET  porder_no=%s, duedate=%s, businessname=%s, extracostname=%s, extracost=%s, template=%s, salesper=%s,discourate=%s, tax1=%s, tax2=%s,category=%s, deliveryto=%s,deliveryaddress=%s, cpemail=%s, cpmobileforsms=%s,title_text=%s,header_text=%s,footer_text=%s,term_of_payment=%s,terms=%s,comments=%s,privatenote=%s,ordertot=%s,sumdiscount=%s,sumtax1=%s,sumtax2=%s,sumsubtotal=%s WHERE porder_no=%s'
     # val2=(porderdate,duedate,status,emailon,printon,pordtot,extracostname,extracost, salesper,discourate,tax1,tax2, category,businessname,businessaddress,delname, deladdress,cpemail,cpmobileforsms,title_text, header_text, footer_text,term_of_payment,terms,comments,pvt,sum_dis,subtotal,sum_tax1,sum_tax2,sub1,porderid)
@@ -16277,73 +16317,74 @@ def mainpage():
         
   #----------------Create Email-----------------#
 
-    def pord_send_mail_1():
+  def pord_send_mail_1():
 
-      sender_email_1 = "sagarasagu49@gmail.com" #email_from.get()                                 
-      sender_password_1 = "sagara21@sagu"        #email_pswrd.get() 
+    sender_email_1 = "sagarasagu49@gmail.com" #email_from.get()                                 
+    sender_password_1 = "sagara21@sagu"        #email_pswrd.get() 
 
-      server_1 = smtplib.SMTP('smtp.gmail.com', 587)
-      print("Login successful1")
-      server_1.starttls()
-      print("Login successful2")
-      server_1.login(sender_email_1, sender_password_1)
-      print("Login successful3")
-      carbcopy_info_1 = "krishnasanthosh101999@gmail.com"      #carcopyem_address.get()
-      print(carbcopy_info_1)
+    server_1 = smtplib.SMTP('smtp.gmail.com', 587)
+    print("Login successful1")
+    server_1.starttls()
+    print("Login successful2")
+    server_1.login(sender_email_1, sender_password_1)
+    print("Login successful3")
+    carbcopy_info_1 = "krishnasanthosh101999@gmail.com"      #carcopyem_address.get()
+    print(carbcopy_info_1)
       
       
-      msg_1 = MIMEMultipart()
-      msg_1['Subject'] = email_subject.get() 
-      mail_content  = pordmemaiframe.get('1.0','end-1c') 
-      msg_1['From'] = email_from.get()
-      msg_1['To'] = pord_emailtoent.get()
+    msg_1 = MIMEMultipart()
+    msg_1['Subject'] = email_subject.get() 
+    mail_content  = pordmemaiframe.get('1.0','end-1c') 
+    msg_1['From'] = email_from.get()
+    msg_1['To'] = pord_emailtoent.get()
       
-      gettingimg=pordframe.get()
-      print(gettingimg)
-      lst_data = gettingimg[1:-1].split(',')
-      print(lst_data,"happy")
+    gettingimg=pordframe.get()
+    print(gettingimg)
+    lst_data = gettingimg[1:-1].split(',')
+    print(lst_data,"happy")
       # print(gettingimg)
-      msg_1.attach(MIMEText(mail_content, 'plain'))
+    msg_1.attach(MIMEText(mail_content, 'plain'))
 
-      for i in lst_data:
-        if len(i.strip()[1:-1])>1:
+    for i in lst_data:
+      if len(i.strip()[1:-1])>1:
         # print(i[0],"IMAGE")
-          with open('images/'+ i.strip()[1:-1], "rb") as attachment:
+        with open('images/'+ i.strip()[1:-1], "rb") as attachment:
               # MIME attachment is a binary file for that content type "application/octet-stream" is used
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.read())
+          part = MIMEBase("application", "octet-stream")
+          part.set_payload(attachment.read())
           # encode into base64 
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', "attachment; filename= %s" % 'images/'+ i.strip()[1:-1]) 
+          encoders.encode_base64(part)
+          part.add_header('Content-Disposition', "attachment; filename= %s" % 'images/'+ i.strip()[1:-1]) 
 
         # attach the instance 'part' to instance 'message' 
-            msg_1.attach(part)
+          msg_1.attach(part)
         # message_body = email_body.get()
 
-      server_1.sendmail(email_from.get(),pord_emailtoent.get(),msg_1.as_string())
-      server_1.sendmail(email_from.get(), carbcopy_info_1,msg_1.as_string())
-      print("message sent")
-    def pord_empsfile_image_1(event):
-      global yawn
-      for i in  pord_htcodeframe.curselection():
-        print("hloo", pord_htcodeframe.get(i))
-        yawn= pord_htcodeframe.get(i)        
-        edit_window_img = Toplevel()
-        edit_window_img.title("View Image")
-        edit_window_img.geometry("700x500")
-        image = Image.open("images/"+yawn)
-        resize_image = image.resize((700, 500))
-        image = ImageTk.PhotoImage(resize_image)
-        psimage = Label(edit_window_img,image=image)
-        psimage.photo = image
-        psimage.pack()
+    server_1.sendmail(email_from.get(),pord_emailtoent.get(),msg_1.as_string())
+    server_1.sendmail(email_from.get(), carbcopy_info_1,msg_1.as_string())
+    print("message sent")
+  def pord_empsfile_image_1(event):
+    global yawn
+    for i in  pord_htcodeframe.curselection():
+      print("hloo", pord_htcodeframe.get(i))
+      yawn= pord_htcodeframe.get(i)        
+      edit_window_img = Toplevel()
+      edit_window_img.title("View Image")
+      edit_window_img.geometry("700x500")
+      image = Image.open("images/"+yawn)
+      resize_image = image.resize((700, 500))
+      image = ImageTk.PhotoImage(resize_image)
+      psimage = Label(edit_window_img,image=image)
+      psimage.photo = image
+      psimage.pack()
 
-    def pord_UploadAction_1(event=None):
-      global filenamez
+  def pord_UploadAction_1(event=None):
+    global filenamez
 
-      filenamez = askopenfilename(filetypes=(("png file ",'.png'),("jpg file", ".jpg"), ('PDF', '.pdf',), ("All files", ".*"),))
-      shutil.copyfile(filenamez, os.getcwd()+'/images/'+filenamez.split('/')[-1])
-      pord_htcodeframe.insert(0, filenamez.split('/')[-1])
+    filenamez = askopenfilename(filetypes=(("png file ",'.png'),("jpg file", ".jpg"), ('PDF', '.pdf',), ("All files", ".*"),))
+    shutil.copyfile(filenamez, os.getcwd()+'/images/'+filenamez.split('/')[-1])
+    pord_htcodeframe.insert(0, filenamez.split('/')[-1])
+
   def addemail_porder():
     mailDetail=Toplevel()
     mailDetail.title("Porder E-Mail")
@@ -16382,7 +16423,7 @@ def mainpage():
 
     messagelbframe=LabelFrame(email_Frame,text="Message", height=500, width=730)
     messagelbframe.place(x=5, y=5)
-    global email_address, email_subject, email_from,email_pswrd,carcopyem_address,mframe,pord_htcodeframe,lstfrm,langs
+    global email_address, email_subject, email_from,email_pswrd,carcopyem_address,pord_mframe,pord_htcodeframe,lstfrm,langs
     email_address = StringVar() 
     email_subject = StringVar()
     # email_body = StringVar()
@@ -16408,7 +16449,78 @@ def mainpage():
     subent.place(x=120, y=59)
     subjectinsrt='PORD_'+str()
     # 
+
+    fontSize=12
+    fontStyle='arial'
+    def pordfont_style(event):
+      global fontStyle
+      fontStyle=font_family__variable.get()
+      pord_mframe.config(font=(fontStyle,fontSize))
+
+    def pordfont_size(event):
+      global fontSize
+      fontSize=size_variable.get()
+      pord_mframe.config(font=(fontStyle,fontSize))
     
+    def pordbold_text():
+      bold_font = font.Font(pord_mframe, pord_mframe.cget("font"))
+      bold_font.configure(weight="bold")
+      pord_mframe.tag_configure("bold", font=bold_font)
+      current_tags = pord_mframe.tag_names("sel.first")
+      if "bold" in current_tags:
+        pord_mframe.tag_remove("bold", "sel.first", "sel.last")
+      else:
+        pord_mframe.tag_add("bold", "sel.first", "sel.last")
+    
+    
+    def porditalic_text():
+      italic_font = font.Font(pord_mframe, pord_mframe.cget("font"))
+      italic_font.configure(slant="italic")
+      pord_mframe.tag_configure("italic", font=italic_font)
+      current_tags = pord_mframe.tag_names("sel.first")
+      if "italic" in current_tags:
+        pord_mframe.tag_remove("italic", "sel.first", "sel.last")
+      else:
+        pord_mframe.tag_add("italic", "sel.first", "sel.last")
+
+    def pordunderline_text():
+      try:
+          if pord_mframe.tag_nextrange('underline_selection', 'sel.first', 'sel.last') != ():
+              pord_mframe.tag_remove('underline_selection', 'sel.first', 'sel.last')
+          else:
+              pord_mframe.tag_add('underline_selection', 'sel.first', 'sel.last')
+              pord_mframe.tag_configure('underline_selection', underline=True)
+      except TclError:
+          pass
+
+    def pordcolor_select():
+      color=colorchooser.askcolor()[1]
+      if color:
+        color_font = font.Font(pord_mframe, pord_mframe.cget("font"))
+        pord_mframe.tag_configure("colored", font=color_font, foreground=color)
+        current_tags = pord_mframe.tag_names("sel.first")
+        if "colored" in current_tags:
+          pord_mframe.tag_remove("colored", "sel.first", "sel.last")
+        else:
+          pord_mframe.tag_add("colored", "sel.first", "sel.last")
+
+    def pordalign_right():
+      data=pord_mframe.get(0.0,END)
+      pord_mframe.tag_config('right',justify=RIGHT)
+      pord_mframe.delete(0.0,END)
+      pord_mframe.insert(INSERT,data,'right')
+
+    def pordalign_left():
+      data=pord_mframe.get(0.0,END)
+      pord_mframe.tag_config('left',justify=LEFT)
+      pord_mframe.delete(0.0,END)
+      pord_mframe.insert(INSERT,data,'left')
+
+    def pordalign_center():
+      data=pord_mframe.get(0.0,END)
+      pord_mframe.tag_config('center',justify=CENTER)
+      pord_mframe.delete(0.0,END)
+      pord_mframe.insert(INSERT,data,'center')
 
     
     style = ttk.Style()
@@ -16416,48 +16528,90 @@ def mainpage():
     style.configure('TNotebook.Tab', background="#999999", width=20, padding=5)
     mess_Notebook = ttk.Notebook(messagelbframe)
     emailmessage_Frame =Frame(mess_Notebook, height=350, width=710)
-    htmlsourse_Frame = Frame(mess_Notebook, height=350, width=710)
     mess_Notebook.add(emailmessage_Frame, text="E-mail message")
-    mess_Notebook=Entry(emailmessage_Frame, width=710,height=350, textvariable=email_subject)
-    mess_Notebook.place(x=120, y=59)
-    mess_Notebook.add(htmlsourse_Frame, )#text="Html source code")
+    # mess_Notebook=Entry(emailmessage_Frame, width=710)
+    # mess_Notebook.place(x=120, y=59)
+    # mess_Notebook.add(htmlsourse_Frame, )#text="Html source code")
     mess_Notebook.place(x=5, y=90)
 
-    # btn1=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=selectall).place(x=0, y=1)
+    pord_btn1=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=selectall,command=lambda :pord_mframe.event_generate('<Control a>'))
+    pord_btn1.place(x=0, y=1)
 
     
-    # btn2=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=cut).place(x=36, y=1)
-    # btn3=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=copy).place(x=73, y=1)
-    # btn4=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=paste).place(x=105, y=1)
-    # btn5=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=undo).place(x=140, y=1)
-    # btn6=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=redo).place(x=175, y=1)
-    # btn7=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=bold).place(x=210, y=1)
-    # btn8=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=italics).place(x=245, y=1)
-    # btn9=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=underline).place(x=280, y=1)
-    # btn10=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=left).place(x=315, y=1)
-    # btn11=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=right).place(x=350, y=1)
-    # btn12=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=center).place(x=385, y=1)
-    # btn13=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=hyperlink).place(x=420, y=1)
+    pord_btn2=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=cut,command=lambda :pord_mframe.event_generate('<Control x>'))
+    pord_btn2.place(x=36, y=1)
+
+    pord_btn3=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=copy,command=lambda :pord_mframe.event_generate('<Control c>'))
+    pord_btn3.place(x=73, y=1)
+
+    pord_btn4=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=paste,command=lambda :pord_mframe.event_generate('<Control v>'))
+    pord_btn4.place(x=105, y=1)
+
+    pord_btn5=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=undo,command=lambda:pord_mframe.event_generate("<<Undo>>"))
+    pord_btn5.place(x=140, y=1)
+
+    pord_btn6=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=redo,command=lambda:pord_mframe.event_generate("<<Redo>>"))
+    pord_btn6.place(x=175, y=1)
+
+    pord_btn7=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=bold,command=pordbold_text)
+    pord_btn7.place(x=210, y=1)
+
+    pord_btn8=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=italics,command=porditalic_text)
+    pord_btn8.place(x=245, y=1)
+
+    pord_btn9=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=underline,command=pordunderline_text)
+    pord_btn9.place(x=280, y=1)
+
+    pord_btn10=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=left,command=pordalign_left)
+    pord_btn10.place(x=315, y=1)
+
+    pord_btn11=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=right,command=pordalign_right)
+    pord_btn11.place(x=350, y=1)
+
+    pord_btn12=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=center,command=pordalign_center)
+    pord_btn12.place(x=385, y=1)
+
+    # pord_btn13=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=hyperlink)
+    # pord_btn13.place(x=420, y=1)
     
-    # btn14=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=remove).place(x=455, y=1)
+    pord_btn14=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=remove,command=lambda :memaiframe.delete(0.0,END))
+    pord_btn14.place(x=420, y=1)
+
+    pord_btn15=Button(emailmessage_Frame,width=31,height=23,compound = LEFT,image=color,command=pordcolor_select)
+    pord_btn15.place(x=455, y=1)
 
 
-    # dropcomp = ttk.Combobox(emailmessage_Frame, width=12, height=3).place(x=500, y=5)
-    # dropcompo = ttk.Combobox(emailmessage_Frame, width=6, height=3).place(x=600, y=5)
-    mframe=scrolledtext.Text(emailmessage_Frame,  undo=True,width=88, bg="white", height=22)
-    mframe.place(x=0, y=10)
+    pord_dropcomp = ttk.Combobox(emailmessage_Frame, width=12, height=3,values=tuple(range(10,80)))
+    pord_dropcomp['values'] =('11','12','13','14','15','16','17')
+    pord_dropcomp.place(x=500, y=5)
+    pord_dropcomp.current(4)
+    pord_dropcomp.bind('<<ComboboxSelected>>',pordfont_size)
+
+    font_families=font.families()
+    font_family__variable=StringVar()
+
+    # pord_dropcompo = ttk.Combobox(emailmessage_Frame, width=6, height=3)
+    # pord_dropcompo.place(x=600, y=5)
+
+    pord_mframe=Text(emailmessage_Frame,  undo=True,width=88, bg="white", height=22)
+    pord_mframe.pack(padx=0, pady=40,expand=False)
+
+    pord_scrollbar1 = Scrollbar(emailmessage_Frame,orient=VERTICAL)
+    pord_scrollbar2= Scrollbar(pord_mframe,orient=HORIZONTAL,command=pord_mframe.xview,width=0)
+    pord_scrollbar2.pack(fill=X,expand=True,side=BOTTOM,padx=327,pady=188)
+    pord_mframe.config(xscrollcommand=scrollbar2.set)
+    pord_mframe.config(yscrollcommand=scrollbar1.set)
+    pord_scrollbar1.config(command=pord_mframe.yview)
+    pord_scrollbar1.place(x =690, y=40, height=305)
+    pord_scrollbar2.config(command=pord_mframe.xview)
+    pord_scrollbar3= Scrollbar(emailmessage_Frame,orient=HORIZONTAL,command=pord_mframe.xview, width=0)
+    pord_scrollbar3.place(x=0, y=340, height=20,width=705)
+
     # mess_Notebook=Entry(emailmessage_Frame, width=710,height=350, textvariable=email_subject)
     # mess_Notebook.place(x=120, y=59)
 
 
-    # btn1=Button(htmlsourse_Frame,width=31,height=23,compound = LEFT,image=selectall).place(x=0, y=1)
-
-    
-    # btn2=Button(htmlsourse_Frame,width=31,height=23,compound = LEFT,image=cut).place(x=36, y=1)
-    # btn3=Button(htmlsourse_Frame,width=31,height=23,compound = LEFT,image=copy).place(x=73, y=1)
-    # btn4=Button(htmlsourse_Frame,width=31,height=23,compound = LEFT,image=paste).place(x=105, y=1)
-    # mframe1=Frame(htmlsourse_Frame, height=350, width=710, bg="white")
-    # mframe1.place(x=0, y=28)
+   
     attachlbframe=LabelFrame(email_Frame,text="Attachment(s)", height=350, width=280)
     attachlbframe.place(x=740, y=5)
     # langs=[]
@@ -16473,7 +16627,7 @@ def mainpage():
         pord_htcodeframe.delete(ACTIVE)
 
     lbl_btn_info=Label(attachlbframe, text="Double click on attachment to view").place(x=30, y=230)
-    btn17=Button(attachlbframe, width=20, text="Add attachment file...", command=UploadAction).place(x=60, y=260)
+    btn17=Button(attachlbframe, width=20, text="Add attachment file...", command=pord_UploadAction_1).place(x=60, y=260)
     btn18=Button(attachlbframe, width=20, text="Remove attachment",command=deslist).place(x=60, y=295)
     lbl_tt_info=Label(email_Frame, text="You can create predefined invoice, order, estimate\nand payment receipt email templates under Main\nmenu/Settings/E-Mail templates tab")
     lbl_tt_info.place(x=740, y=370)
@@ -16481,14 +16635,14 @@ def mainpage():
     ready_frame=Frame(mailDetail, height=20, width=1080, bg="#b3b3b3").place(x=0,y=530)
     
     sendatalbframe=LabelFrame(account_Frame,text="E-Mail(Sender data)",height=140, width=600)
-    sendatalbframe.place(x=5, y=5)
-    lbl_sendermail=Label(sendatalbframe, text="Company email address").place(x=5, y=10)
+    sendatalbframe.place(x=250, y=150)
+    lbl_sendermail=Label(sendatalbframe, text="Company email address").place(x=50, y=20)
     sentent=Entry(sendatalbframe, width=40, textvariable=email_from)
-    sentent.place(x=195, y=10)
+    sentent.place(x=240, y=20)
     #############################################
-    lbl_senderpswrd=Label(sendatalbframe, text="Email Password").place(x=5, y=40)
+    lbl_senderpswrd=Label(sendatalbframe, text="Email Password").place(x=50, y=60)
     pswrdent=Entry(sendatalbframe, width=40, textvariable=email_pswrd,show="*")
-    pswrdent.place(x=195, y=40)  
+    pswrdent.place(x=240, y=60)  
 
   def addacnt():  
     messagebox.showinfo("F-Billing Revolution 2022", "No sender email address.\nPlease fill Your company email address textfield under the Account tab.")
@@ -16642,34 +16796,7 @@ def mainpage():
           pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
           count_cus +=1
         top.destroy()
-      elif find_txt_var.get()=="Order date":
-        fnd_sql="select * from porder where porderdate=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-        
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
-      elif find_txt_var.get()=="Due date":
-        fnd_sql="select * from porder where duedate=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-        
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
+     
       elif find_txt_var.get()=="Customer Name":
         fnd_sql="select * from porder where businessname=%s"
         fnd_sql_val=(fnd_srh_txt.get(),)
@@ -16684,62 +16811,7 @@ def mainpage():
           pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
           count_cus +=1
         top.destroy()
-      elif find_txt_var.get()=="Status":
-        fnd_sql="select * from porder where 	status=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-          
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
-      elif find_txt_var.get()=="Emailed on":
-        fnd_sql="select * from porder where emailon=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-          
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
-      elif find_txt_var.get()=="Printed on":
-        fnd_sql="select * from porder where 	printon=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-          
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
-      elif find_txt_var.get()=="SMS on":
-        fnd_sql="select * from porder where 	smson=%s"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-          
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
+ 
       elif find_txt_var.get()=="Order Total":
         fnd_sql="select * from porder where 	ordertot=%s"
         fnd_sql_val=(fnd_srh_txt.get(),)
@@ -16755,23 +16827,7 @@ def mainpage():
           count_cus +=1
         top.destroy()  
 
-      elif find_txt_var.get()=="<<All>>":
-        fnd_sql="select * from customer"
-        fnd_sql_val=(fnd_srh_txt.get(),)
-        fbcursor.execute(fnd_sql,fnd_sql_val)
-        htj=fbcursor.fetchall()
-        for record in pord_tree.get_children():
-          pord_tree.delete(record)
-        count_cus=0
-
-        for i in htj:
-          
-          pord_tree.insert(parent='', index='end', iid=count_cus, text='hello', values=(' ',i[39], i[2], i[3], i[25],i[5], i[6], i[7], i[8], i[9], i[10]))
-          count_cus +=1
-        top.destroy()
-    def fnd_dist():
-      top.destroy()
-
+      
     top = Toplevel()  
     top.title("Find Text")
     p2 = PhotoImage(file = "images/fbicon.png")
@@ -16788,40 +16844,33 @@ def mainpage():
     findin1.place(x=5,y=40)
     find_txt_var = StringVar() 
     findIN = ttk.Combobox(top, width = 37, textvariable =find_txt_var )
-    findIN['values'] = ('P.Order#',  
-                              'Order date', 
-                              'Due date', 
+    findIN['values'] = ('P.Order#',
                               'Customer Name', 
-                              'Status', 
-                              'Emailed on',
-                              'Printed on',
-                              'SMS on',
-                              'Order Total',
-                              '<<All>>')        
+                              'Order Total')        
     findIN.place(x=85,y=40,height=23) 
     findIN.current(0)
     closeButton = Button(top, text ="Close",width=10, command=lambda:fnd_dist())
     closeButton.place(x=420,y=45)
    
-    up_var = StringVar() 
-    checkvarStatus4=IntVar()
-    Button4 = Checkbutton(top,variable = checkvarStatus4, 
-                      text="Match Case", 
-                      onvalue =0 ,
-                      offvalue = 1,
-                      height=3,
-                      width = 15)
-    Button4.select()
-    Button4.place(x=60,y=80)
-    checkvarStatus5=IntVar()  
-    Button5 = Checkbutton(top,variable = checkvarStatus5, 
-                      text="Match Format", 
-                      onvalue =0 ,
-                      offvalue = 1,
-                      height=3,
-                      width = 15)
-    Button5.select()
-    Button5.place(x=270,y=80)
+    # up_var = StringVar() 
+    # checkvarStatus4=IntVar()
+    # Button4 = Checkbutton(top,variable = checkvarStatus4, 
+    #                   text="Match Case", 
+    #                   onvalue =0 ,
+    #                   offvalue = 1,
+    #                   height=3,
+    #                   width = 15)
+    # Button4.select()
+    # Button4.place(x=60,y=80)
+    # checkvarStatus5=IntVar()  
+    # Button5 = Checkbutton(top,variable = checkvarStatus5, 
+    #                   text="Match Format", 
+    #                   onvalue =0 ,
+    #                   offvalue = 1,
+    #                   height=3,
+    #                   width = 15)
+    # Button5.select()
+    # Button5.place(x=270,y=80)
     top.mainloop()
 
 
@@ -17410,7 +17459,73 @@ def mainpage():
   drop1 = ttk.Combobox(purch_mainFrame, value="Hello")
   drop1.pack(side="right", padx=(0,10))
   purch1label = Label(purch_mainFrame, text="Category filter", font=("arial", 15), bg="#f8f8f2")
-  purch1label.pack(side="right", padx=(0,10))
+  purch1label.pack(side="right", padx =(0,10))
+
+
+  def pord_check_convertion(B):
+    BYTE = float(B)
+    KB = float(1024)
+    MB = float(KB**2)
+    if BYTE < KB:
+      return '{0} {1}'.format(BYTE,'Bytes' if 0 == B > 1 else 'Byte')
+    elif KB <= BYTE < MB:
+      return '{0:.2f} KB'.format(BYTE / KB)
+    elif MB <= BYTE:
+      return '{0:.2f} MB'.format(BYTE / MB)
+  ############----------Product---------###########
+  def pord_view_details(event):
+    for record in purch_main_tree.get_children():
+      purch_main_tree.delete(record)
+    pordnum = est_tree.item(est_tree.focus())["values"][1]
+    sql = 'select * from storingproduct where pord_no = %s'
+    val = (pordnum,)
+    fbcursor.execute(sql,val)
+    pord_storingproduct = fbcursor.fetchall()
+    sql = 'select * from company'
+    fbcursor.execute(sql)
+    pord_check_protax = fbcursor.fetchone()
+    counto = 0
+    if not pord_check_protax:
+      for i in pord_storingproduct:
+        purch_main_tree.insert(parent='',index='end',text='',values=('',i[2],i[6],i[7],i[8],i[9],i[13]))
+        counto += 1
+    elif pord_check_protax[12] == '1':
+      for i in pord_storingproduct:
+        purch_main_tree.insert(parent='',index='end',text='',values=('',i[2],i[6],i[7],i[8],i[9],i[13]))
+        counto += 1
+    elif pord_check_protax[12] == '2':
+      for i in pord_storingproduct:
+        purch_main_tree.insert(parent='',index='end',text='',values=('',i[2],i[6],i[7],i[8],i[9],i[11],i[13]))
+        counto += 1
+    elif pord_check_protax[12] == '3':
+      for i in pord_storingproduct:
+        purch_main_tree.insert(parent='',index='end',text='',values=('',i[2],i[6],i[7],i[8],i[9],i[11],i[12],i[13]))
+        counto += 1
+
+  ############----------Private note display---------###########
+  
+    sql = 'select privatenote from porder where pord_no = %s'
+    val = (pordnum,)
+    fbcursor.execute(sql,val)
+    pord_privatenotes = fbcursor.fetchone()
+    pord_pvt_note1.delete('1.0',END)
+    pord_pvt_note1.insert('1.0',pord_privatenotes[30])
+
+  ############----------Documents---------###########
+    
+    
+    for record in treeblw.get_children():
+      treeblw.delete(record)
+    doc_sql = "SELECT * FROM documents WHERE pord_no=%s"
+    doc_val = (pordnum,)
+    fbcursor.execute(doc_sql,doc_val)
+    doc_details = fbcursor.fetchall()
+    print(doc_details)
+    countdoc = 0
+    for doc in doc_details:
+      file_size_3 = pord_check_convertion(os.path.getsize("images/"+doc[6]))
+      treeblw.insert(parent='',index='end',iid=doc,text='',values=('',doc[6],file_size_3))
+    countdoc += 1  
 
   class MyApp1:
     def __init__(self, parent):
@@ -17488,19 +17603,19 @@ def mainpage():
       #     hidden=True
 
 
-      def prdctpicker(event):
-        selected = pord_tree.focus()
-        selected_prdct= pord_tree.item(selected)["values"][1]
-        for record in tree.get_children():
-          tree.delete(record)
-        sqlprdct='SELECT * FROM storingproduct WHERE porderid=%s'
-        valprdct=(selected_prdct,)
-        fbcursor.execute(sqlprdct,valprdct)
-        prdctsltn=fbcursor.fetchall()
-        j = 0
-        for i in prdctsltn:
-         tree.insert(parent='', index='end', iid=i, text='', values=(' ',i[21], i[6], i[7],i[9],i[22],i[12],(i[9]*i[22])))
-        j += 1
+      # def prdctpicker(event):
+      #   selected = pord_tree.focus()
+      #   selected_prdct= pord_tree.item(selected)["values"][1]
+      #   for record in tree.get_children():
+      #     tree.delete(record)
+      #   sqlprdct='SELECT * FROM storingproduct WHERE porderid=%s'
+      #   valprdct=(selected_prdct,)
+      #   fbcursor.execute(sqlprdct,valprdct)
+      #   prdctsltn=fbcursor.fetchall()
+      #   j = 0
+      #   for i in prdctsltn:
+      #    tree.insert(parent='', index='end', iid=i, text='', values=(' ',i[21], i[6], i[7],i[9],i[22],i[12],(i[9]*i[22])))
+      #   j += 1
 
       #   notefchz="SELECT * FROM porder WHERE porderid=%s"
       #   fchz = (selected_prdct,)
@@ -17519,7 +17634,7 @@ def mainpage():
       #    treeblw.insert(parent='', index='end', iid=i, text='', values=(' ',i[2]))
       #   j += 1
 
-      pord_tree.bind('<Double-Button-1>' , prdctpicker)
+      # pord_tree.bind('<Double-Button-1>' , prdctpicker)
 
       # fbcursor.execute('SELECT * FROM porder;')
       # pordertotalinput=0
@@ -17558,29 +17673,139 @@ def mainpage():
       tabControl.add(tab3,image=smslog,compound = LEFT, text ='SMS log')
       tabControl.add(tab4,image=photo11,compound = LEFT, text ='Documents')
       tabControl.pack(expand = 1, fill ="both")
-      
-      tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
-      tree.pack(side = 'top')
-      tree.heading(1)
-      tree.heading(2, text="Product/Service ID",)
-      tree.heading(3, text="Name")
-      tree.heading(4, text="Description")
-      tree.heading(5, text="Price")
-      tree.heading(6, text="QTY")
-      tree.heading(7, text="Tax1")
-      tree.heading(8, text="Tax2")
-      tree.heading(9, text="Line Total")   
-      tree.column(1, width = 40)
-      tree.column(2, width = 260)
-      tree.column(3, width = 260)
-      tree.column(4, width = 300)
-      tree.column(5, width = 130)
-      tree.column(6, width = 100)
-      tree.column(7, width = 50)
-      tree.column(8, width = 50)
-      tree.column(9, width = 150)
 
-      note1=Text(tab2, width=170,height=10).place(x=10, y=10)
+
+      sql = "select * from company"
+      fbcursor.execute(sql)
+      ptaxdata = fbcursor.fetchone()
+      if not ptaxdata:
+          #global purch_tree
+        purch_main_tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
+        purch_main_tree.pack(side = 'top')
+        purch_main_tree.heading(1)
+        purch_main_tree.heading(2, text="Product/Service ID",)
+        purch_main_tree.heading(3, text="Name")
+        purch_main_tree.heading(4, text="Description")
+        purch_main_tree.heading(5, text="Price")
+        purch_main_tree.heading(6, text="QTY")
+        purch_main_tree.heading(7, text="Tax1")
+        purch_main_tree.heading(8, text="Tax2")
+        purch_main_tree.heading(9, text="Line Total")
+        purch_main_tree.column(1, width = 40)
+        purch_main_tree.column(2, width = 260)
+        purch_main_tree.column(3, width = 260)
+        purch_main_tree.column(4, width = 300)
+        purch_main_tree.column(5, width = 130)
+        purch_main_tree.column(6, width = 100)
+        purch_main_tree.column(7, width = 50)
+        purch_main_tree.column(8, width = 50)
+        purch_main_tree.column(9, width = 150)
+
+      elif ptaxdata[12] == "1":
+        purch_main_tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
+        purch_main_tree.pack(side = 'top')
+        purch_main_tree.heading(1)
+        purch_main_tree.heading(2, text="Product/Service ID",)
+        purch_main_tree.heading(3, text="Name")
+        purch_main_tree.heading(4, text="Description")
+        purch_main_tree.heading(5, text="Price")
+        purch_main_tree.heading(6, text="QTY")
+        purch_main_tree.heading(7, text="Tax1")
+        purch_main_tree.heading(8, text="Tax2")
+        purch_main_tree.heading(9, text="Line Total")
+        purch_main_tree.column(1, width = 40)
+        purch_main_tree.column(2, width = 260)
+        purch_main_tree.column(3, width = 260)
+        purch_main_tree.column(4, width = 300)
+        purch_main_tree.column(5, width = 130)
+        purch_main_tree.column(6, width = 100)
+        purch_main_tree.column(7, width = 50)
+        purch_main_tree.column(8, width = 50)
+        purch_main_tree.column(9, width = 150)
+
+      elif ptaxdata[12] == "2":
+        purch_main_tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
+        purch_main_tree.pack(side = 'top')
+        purch_main_tree.heading(1)
+        purch_main_tree.heading(2, text="Product/Service ID",)
+        purch_main_tree.heading(3, text="Name")
+        purch_main_tree.heading(4, text="Description")
+        purch_main_tree.heading(5, text="Price")
+        purch_main_tree.heading(6, text="QTY")
+        purch_main_tree.heading(7, text="Tax1")
+        purch_main_tree.heading(8, text="Tax2")
+        purch_main_tree.heading(9, text="Line Total")
+        purch_main_tree.column(1, width = 40)
+        purch_main_tree.column(2, width = 260)
+        purch_main_tree.column(3, width = 260)
+        purch_main_tree.column(4, width = 300)
+        purch_main_tree.column(5, width = 130)
+        purch_main_tree.column(6, width = 100)
+        purch_main_tree.column(7, width = 50)
+        purch_main_tree.column(8, width = 50)
+        purch_main_tree.column(9, width = 150)
+
+        
+
+      elif ptaxdata[12] == "3":
+        purch_main_tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
+        purch_main_tree.pack(side = 'top')
+        purch_main_tree.heading(1)
+        purch_main_tree.heading(2, text="Product/Service ID",)
+        purch_main_tree.heading(3, text="Name")
+        purch_main_tree.heading(4, text="Description")
+        purch_main_tree.heading(5, text="Price")
+        purch_main_tree.heading(6, text="QTY")
+        purch_main_tree.heading(7, text="Tax1")
+        purch_main_tree.heading(8, text="Tax2")
+        purch_main_tree.heading(9, text="Line Total")
+        purch_main_tree.column(1, width = 40)
+        purch_main_tree.column(2, width = 260)
+        purch_main_tree.column(3, width = 260)
+        purch_main_tree.column(4, width = 300)
+        purch_main_tree.column(5, width = 130)
+        purch_main_tree.column(6, width = 100)
+        purch_main_tree.column(7, width = 50)
+        purch_main_tree.column(8, width = 50)
+        purch_main_tree.column(9, width = 150)
+          
+        # purch_main_tree.heading("#0")
+        # purch_main_tree.heading("1",text="ID/SKU")
+        # purch_main_tree.heading("2",text="Product/Service")
+        # purch_main_tree.heading("3",text="Description")
+        # purch_main_tree.heading("4",text="Unit Price")
+        # purch_main_tree.heading("5",text="Quantity")
+        # purch_main_tree.heading("6",text="Pcs/Weight")
+        # purch_main_tree.heading("7",text="Tax1")
+        # purch_main_tree.heading("8",text="Tax2")
+        # purch_main_tree.heading("9",text="Price")
+        
+        # purch_main_tree.pack(fill="both", expand=1)
+        # listFrame.pack(side="top", fill="both", padx=5, pady=3, expand=1)
+
+        
+      # tree = ttk.Treeview(tab1, columns = (1,2,3,4,5,6,7,8,9,), height = 15, show = "headings")
+      # tree.pack(side = 'top')
+      # tree.heading(1)
+      # tree.heading(2, text="Product/Service ID",)
+      # tree.heading(3, text="Name")
+      # tree.heading(4, text="Description")
+      # tree.heading(5, text="Price")
+      # tree.heading(6, text="QTY")
+      # tree.heading(7, text="Tax1")
+      # tree.heading(8, text="Tax2")
+      # tree.heading(9, text="Line Total")   
+      # tree.column(1, width = 40)
+      # tree.column(2, width = 260)
+      # tree.column(3, width = 260)
+      # tree.column(4, width = 300)
+      # tree.column(5, width = 130)
+      # tree.column(6, width = 100)
+      # tree.column(7, width = 50)
+      # tree.column(8, width = 50)
+      # tree.column(9, width = 150)
+
+      pord_pvt_note1=Text(tab2, width=170,height=10).place(x=10, y=10)
 
       note1=Text(tab3, width=170,height=10).place(x=10, y=10)
 
